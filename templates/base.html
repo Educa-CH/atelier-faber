@@ -1,0 +1,25 @@
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+        <meta charset="UTF8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='images/cert.ico') }}">
+        {% block head  %}{% endblock %}
+    </head>
+    <body>
+    <header id="header">
+        <h1>Educa</h1>
+    </header>
+    <main id="main">
+        {% block index %}
+        {% endblock %}
+    </main>
+    <footer id="footer">Copyright &copy;
+        <script type="text/JavaScript">
+        document.write(new Date().getFullYear());
+        </script> Educa
+      </footer>
+    </body>
+</html>

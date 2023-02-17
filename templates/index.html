@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <title>QR Code</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Periodically check the connection status
+            setInterval(function() {
+                $.ajax({
+                    url: '/check_connection',
+                    success: function(data) {
+                        if (data.status == 'connected') {
+                            // Connection has been established, redirect to the next page
+                            window.location.href = '/name';
+                        }
+                    }
+                });
+            }, 5000); // Check every 5 seconds
+        }); 
+</script>
+
+{% endblock %}
+
+{% block index %}
+
+    <h2>Scanne den QR-Code</h2>
+    <img src="{{ url_for('static', filename='images/dynamic_url_qr.png') }}">
+
+{% endblock %}
