@@ -1,18 +1,28 @@
 from flask import Flask, render_template, jsonify, session, request, redirect
+from configparser import ConfigParser
 import qrcode
 import requests
 import json
-import time
 
 
 app = Flask(__name__)
-app.secret_key = 'thisisthesecretestsecretanybodyhaseversecreted'
+
+
+config = ConfigParser()
+config.read('config.ini')
+app.secret_key = config.get('DEFAULT', 'SECRET_KEY', )
+connection_url = config.get('ENDPOINTS', 'CONNECTION_URL').strip("'")
+issuer_url = config.get('ENDPOINTS', 'ISSUER_URL').strip("'")
+cred_def = config.get('CREDENTIAL_DEFINITION', 'CREDENTIAL_DEFINITION').strip("'")
+attr1 = config.get('ATTRIBUTES', 'ATTR1')
+value1 = config.get('VALUES', 'VALUE1')
+
+
 
 @app.route('/')
 def index():
-    url = 'http://localhost:8080/connection/invitation'
+    url = connection_url+ '/connection/invitation'
     response = requests.post(url)
-    print(response.text)
     data = json.loads(response.text)
     dynamic_url = data['invitationUrl']
     session['connection'] = data['connectionId']
@@ -27,7 +37,7 @@ def index():
 @app.route('/check_connection/')
 def check_connection():
     # Check the connection status by making a GET request to the API endpoint
-    url = 'http://localhost:8080/connection/' + session.get('connection', None) 
+    url = connection_url+  '/connection/' + session['connection'] 
     response = requests.get(url)
     if response.text == '"established"':
         # Connection has been established
@@ -39,12 +49,12 @@ def check_connection():
 @app.route('/name', methods=['POST', 'GET'])      
 def name():
     if request.method == 'POST':
-        url = 'http://localhost:8100/issue/process'
+        url = issuer_url + '/issue/process'
         data = {
             "connectionId": session['connection'],
-            "credentialDefinitionId": "E8sTdcBe7fue6eFaAi231P:3:CL:128085:1.0",
+            "credentialDefinitionId": cred_def,
             "attributes": {
-                "score": "99"
+                attr1: value1
             },
             "userId": "Anonymous"
         }
@@ -73,7 +83,7 @@ def name():
 @app.route('/loading/')
 def loading():
     # Check the Acception status by making a GET request to the API endpoint
-    url = 'http://localhost:8100/issue/process/' + session['processId'] + '/state'
+    url = issuer_url+ '/issue/process/' + session['processId'] + '/state'
     response = requests.get(url)
     if response.text != '"IN_PROGRESS"':
         # Credential has been accepted
@@ -88,4 +98,4 @@ def success():
   
 
 if __name__ == "__main__":
-    app.run(debug=True)    
+    app.run(debug=False)    
