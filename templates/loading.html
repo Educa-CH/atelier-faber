@@ -1,31 +1,34 @@
 {% extends 'base.html' %}
 
 {% block head %}
-
-    <title>QR Code</title>
+    <title>Loading</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
             // Periodically check the connection status
             setInterval(function() {
                 $.ajax({
-                    url: '/check_connection',
+                    url: '/loading',
                     success: function(data) {
-                        if (data.status == 'connected') {
+                        if (data.status == 'accepted') {
                             // Connection has been established, redirect to the next page
-                            window.location.href = '/name';
+                            window.location.href = '/success';
                         }
                     }
                 });
             }, 2000); // Check every 5 seconds
         }); 
     </script>
-
+    <style>
+        .center {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
 {% endblock %}
 
 {% block index %}
-
-    <h2>Scanne den QR-Code</h2>
-    <img src="{{ url_for('static', filename='images/dynamic_url_qr.png') }}">
-
+    <h2>Bitte akzeptieren Sie das gesendedete Credential!</h2>
+    <br>
+    <img src="{{ url_for('static', filename='images/giphy.gif') }}" class="center">
 {% endblock %}
