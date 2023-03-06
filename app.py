@@ -7,15 +7,17 @@ import json
 
 app = Flask(__name__)
 
-
 config = ConfigParser()
 config.read('config.ini')
 app.secret_key = config.get('DEFAULT', 'SECRET_KEY', )
 connection_url = config.get('ENDPOINTS', 'CONNECTION_URL').strip("'")
 issuer_url = config.get('ENDPOINTS', 'ISSUER_URL').strip("'")
 cred_def = config.get('CREDENTIAL_DEFINITION', 'CREDENTIAL_DEFINITION').strip("'")
-attr1 = config.get('ATTRIBUTES', 'ATTR1')
-value1 = config.get('VALUES', 'VALUE1')
+attr1 = config.get('ATTRIBUTES', 'ATTR1').strip("'")
+attr2 = config.get('ATTRIBUTES', 'ATTR2').strip("'")
+attr3 = config.get('ATTRIBUTES', 'ATTR3').strip("'")
+value2 = config.get('VALUES', 'VALUE2').strip("'")
+value3 = config.get('VALUES', 'VALUE3').strip("'")
 
 
 
