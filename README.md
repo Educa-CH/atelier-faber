@@ -4,11 +4,33 @@
 This documentation will guide you through the process of understanding and running a Python Flask app. The app utilizes Flask to create a simple web page that connects to external APIs and uses them to perform various functions. The app also utilizes qrcode and requests libraries to generate QR codes and send requests to external APIs.
 
 ## Setup and Installation
-To run this app, you need to have Python 3 installed on your computer. You can download Python 3 from the official Python website: https://www.python.org/downloads/
+To run this app, you need to have Python 3 installed on your computer. You can download Python 3 from the official Python website: https://www.python.org/downloads/. Make sure pip is installed.
 
-Once you have installed Python 3, you need to install the required packages by running the following command in your terminal or command prompt: pip install flask qrcode requests
+Create a virtual environment with: 
 
-After installing the required packages, you can run the app by running the following command in your terminal or command prompt: python app.py
+```
+python3 -m venv env
+
+```
+and activate it with:
+
+```
+source env/bin/activate
+```
+
+Once you have installed Python 3, you need to install the required packages in the virtual environement by running the following command in your terminal or command prompt:
+
+```
+pip install -r requirements.txt
+```
+
+After installing the required packages, you can run the app by running the following command in your terminal or command prompt: 
+
+```
+python app.py
+```
+
+This will start the Flask development server and make the app available at http://localhost:5000/. You can then access the app by navigating to that URL in your web browser.
 
 ## App Functionality
 The app has four main routes:
@@ -25,9 +47,6 @@ The app has four main routes:
 
 ## Files
 The app consists of a single Python file, app.py, which contains all the routes and logic for the app. The file is organized into four main sections, each containing the logic for one of the app's routes.
-
-## Running the App
-To run the app, navigate to the directory containing app.py in your terminal or command prompt and run the following command: python app.py. This will start the Flask development server and make the app available at http://localhost:5000/. You can then access the app by navigating to that URL in your web browser.
 
 ## Conclusion
 Congratulations! You have successfully learned how to build and run a Flask app that utilizes external APIs and libraries to perform various functions. Feel free to modify the app and experiment with new features!
