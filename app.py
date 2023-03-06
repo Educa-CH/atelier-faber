@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, session, request, make_response
+from flask import Flask, render_template, jsonify, session, request
 from configparser import ConfigParser
 import qrcode
 import requests
