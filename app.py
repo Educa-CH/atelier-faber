@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, session, request, redirect
+from flask import Flask, render_template, jsonify, session, request, make_response
 from configparser import ConfigParser
 import qrcode
 import requests
@@ -19,7 +19,12 @@ attr3 = config.get('ATTRIBUTES', 'ATTR3').strip("'")
 value2 = config.get('VALUES', 'VALUE2').strip("'")
 value3 = config.get('VALUES', 'VALUE3').strip("'")
 
-
+# allow site to be embedded in educa.ch 
+# potentially used to emebed as iFrame
+    #@app.after_request
+    #def add_header(response):
+    #    response.headers['X-Frame-Options'] = 'ALLOW-FROM https://educa.ch'
+    #    return response
 
 @app.route('/')
 def index():
@@ -51,12 +56,15 @@ def check_connection():
 @app.route('/name', methods=['POST', 'GET'])      
 def name():
     if request.method == 'POST':
+        name = request.form['name']
         url = issuer_url + '/issue/process'
         data = {
             "connectionId": session['connection'],
             "credentialDefinitionId": cred_def,
             "attributes": {
-                attr1: value1
+                attr1: name,
+                attr2: value2,
+                attr3: value3
             },
             "userId": "Anonymous"
         }
