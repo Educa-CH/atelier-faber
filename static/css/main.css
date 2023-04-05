@@ -1,4 +1,26 @@
 /* Center the body content */
+@font-face {
+  font-weight: 400;
+  font-family: "EducaSans";
+  font-style: normal;
+  src: url(./webfonts/Educa_Sans_Webfonts/EducaSans-Regular.woff2) format("woff2");
+  font-display: auto;
+}
+@font-face {
+  font-weight: 500;
+  font-family: "EducaSans";
+  font-style: normal;
+  src: url(./webfonts/Educa_Sans_Webfonts/EducaSans-Medium.woff2) format("woff2");
+  font-display: auto;
+}
+@font-face {
+  font-weight: 700;
+  font-family: "EducaSans";
+  font-style: normal;
+  src: url(./webfonts/Educa_Sans_Webfonts/EducaSans-Bold.woff2) format("woff2");
+  font-display: auto;
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -6,56 +28,66 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-  }
-  
-  /* Style the header */
-  header {
-    background-color: red;
-    color: white;
-    padding: 10px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
-  
-  /* Style the footer */
-  footer {
-    background-color: red;
-    color: white;
-    padding: 10px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-  }
-  
-  h2 {
-    text-align: center;
-  }
+}
 
+/* Style the header */
+header {
+  background-color: rgb(255, 0, 58);
+  color: white;
+  padding: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
 
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
+/* Style the footer */
+footer {
+  background-color: rgb(255, 0, 58);
+  font-family: "EducaSans", Helvetica, sans-serif;
+  color: white;
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #101a3a;
+  font-family: "EducaSans", Helvetica, sans-serif;
+}
   
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-  
-  label, input, button {
-    margin: 10px;
-    font-size: 25px;
-    width: 100%;
-  }
+h2 {
+  text-align: center;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+label, input, button {
+  font-family: "EducaSans", Helvetica, sans-serif;
+  margin: 10px;
+  font-size: 25px;
+  width: 100%;
+}
 
   
   
