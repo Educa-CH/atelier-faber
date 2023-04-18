@@ -2,30 +2,16 @@
 
 {% block head %}
 
-    <title>QR Code</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Periodically check the connection status
-            setInterval(function() {
-                $.ajax({
-                    url: '/check_connection',
-                    success: function(data) {
-                        if (data.status == 'connected') {
-                            // Connection has been established, redirect to the next page
-                            window.location.href = '/name';
-                        }
-                    }
-                });
-            }, 2000); // Check every 5 seconds
-        }); 
-    </script>
-
+    <title>Name</title>
 {% endblock %}
 
 {% block index %}
-
-    <h2>Scanne den QR-Code</h2>
-    <img src="{{ url_for('static', filename='images/dynamic_url_qr.png') }}">
+<form action="" method="post">
+    <label for="input-box">Geben Sie ihren Namen ein:</label>
+    <br>
+    <input type="text" id="input-box" name="name" required>
+    <br>
+    <button type="submit">Submit</button>
+  </form>
 
 {% endblock %}

@@ -1,60 +1,20 @@
 from flask import Flask, render_template, jsonify, session, request
 from configparser import ConfigParser
-import qrcode
 import requests
 import json
-
+import os
+import time
 
 app = Flask(__name__)
 
-config = ConfigParser()
-config.read('config.ini')
-app.secret_key = config.get('DEFAULT', 'SECRET_KEY', )
-connection_url = config.get('ENDPOINTS', 'CONNECTION_URL').strip("'")
-issuer_url = config.get('ENDPOINTS', 'ISSUER_URL').strip("'")
-cred_def = config.get('CREDENTIAL_DEFINITION', 'CREDENTIAL_DEFINITION').strip("'")
-attr1 = config.get('ATTRIBUTES', 'ATTR1').strip("'")
-attr2 = config.get('ATTRIBUTES', 'ATTR2').strip("'")
-attr3 = config.get('ATTRIBUTES', 'ATTR3').strip("'")
-value2 = config.get('VALUES', 'VALUE2').strip("'")
-value3 = config.get('VALUES', 'VALUE3').strip("'")
-
-# allow site to be embedded in educa.ch 
-# potentially used to emebed as iFrame
-    #@app.after_request
-    #def add_header(response):
-    #    response.headers['X-Frame-Options'] = 'ALLOW-FROM https://educa.ch'
-    #    return response
-
-@app.route('/')
-def index():
-    url = connection_url+ '/connection/invitation'
-    response = requests.post(url)
-    data = json.loads(response.text)
-    dynamic_url = data['invitationUrl']
-    session['connection'] = data['connectionId']
-    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=6, border=4)
-    qr.add_data(dynamic_url)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    img.save("static/images/dynamic_url_qr.png")  # Save the QR code image to a file
-
-    return render_template('index.html', qr_image='static/images/dynamic_url_qr.png')
-
-@app.route('/check_connection/')
-def check_connection():
-    # Check the connection status by making a GET request to the API endpoint
-    url = connection_url+  '/connection/' + session['connection'] 
-    response = requests.get(url)
-    if response.text == '"established"':
-        # Connection has been established
-        return jsonify({'status': 'connected'})
-    else:
-        # Connection has not been established
-        return jsonify({'status': 'not connected'})
-
-@app.route('/name', methods=['POST', 'GET'])      
+@app.route('/', methods=['POST', 'GET'])      
 def name():
+    create_connection_invitation()
+
+    while check_connection() != 'established':
+        time.sleep(2)
+
+
     if request.method == 'POST':
         name = request.form['name']
         url = issuer_url + '/issue/process'
@@ -87,25 +47,68 @@ def name():
             return render_template('failure.html')    
     else:
         #just show the page
-        return render_template('name.html')
+        return render_template('index.html')       
 
+def create_connection_invitation():
+    url = 'https://faber-api.educa.ch/out-of-band/create-invitation'
+    data =  {
+          "accept": [
+               "didcomm/aip1",
+                "didcomm/aip2;env=rfc19"
+               ],
+           "alias": "",
+          "handshake_protocols": [
+                "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"
+               ],
+           "metadata": {},
+          "my_label": "Invitation to Alice",
+            "protocol_version": "1.1",
+            "use_public_did": "false"
+          }
+    
+    print(data)
 
-@app.route('/loading/')
-def loading():
-    # Check the Acception status by making a GET request to the API endpoint
-    url = issuer_url+ '/issue/process/' + session['processId'] + '/state'
-    response = requests.get(url)
-    if response.text != '"IN_PROGRESS"':
-        # Credential has been accepted
-        return jsonify({'status': 'accepted'})
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.post(
+        url,
+        json=data,
+        headers=headers)
+    
+    file_name = 'connection'
+
+    if os.path.getsize(file_name) == 0 and response.status_code == 200:
+        with open(file_name, 'w') as file:
+            file.write(response.text)
+        return 'Message written to file.'
     else:
-        # Credential has not been accepted
-        return jsonify({'status': 'not accepted'})
+        return 'File already has content. Nothing was written.'
 
-@app.route('/success')
-def success():
-    return render_template('success.html')        
-  
+    return "done"
+
+def check_connection():
+    with open('connection', 'r') as f:
+        data = json.load(f)
+
+    # Extract the value of 'connection_id'
+    invitation_msg_id = data['invi_msg_id']
+
+    url =  'https://faber-api.educa.ch/connections?invitation_msg_id=' + invitation_msg_id
+    
+    response = requests.get(url)
+
+    data = json.loads(response.content)
+
+    print(data)
+
+    # Extract the value of 'state'
+    state = data['results'][0]['state']
+
+    if state == 'active':
+        return 'established'
+    else:
+        return 'waiting'
+
 
 if __name__ == "__main__":
-    app.run(debug=False)    
+    app.run(debug=False)  
