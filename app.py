@@ -9,39 +9,58 @@ app = Flask(__name__)
 
 @app.route('/', methods=['POST', 'GET'])      
 def name():
-    create_connection_invitation()
-
-    while check_connection() != 'established':
+    while create_connection_invitation() == 'not available':
         time.sleep(2)
 
+    while check_connection() == 'waiting':
+        time.sleep(2)
+
+    connection_id = check_connection()
 
     if request.method == 'POST':
-        name = request.form['name']
-        url = issuer_url + '/issue/process'
-        data = {
-            "connectionId": session['connection'],
-            "credentialDefinitionId": cred_def,
-            "attributes": {
-                attr1: name,
-                attr2: value2,
-                attr3: value3
-            },
-            "userId": "Anonymous"
-        }
-        print(data)
 
+        creddef_id = get_credential_definition()
+
+        name = request.form['name']
+        score = request.form["score"]
+        url = 'https://faber-api.educa.ch/issue-credential-2.0/send-offer'
+
+        data = {   
+            "connection_id": connection_id, 
+            "comment": "Credential offer", 
+            "auto_remove": "false", 
+            "credential_preview": {
+                "@type": "https://didcomm.org/issue-credential/2.0/credential-preview", 
+                "attributes": [
+                    {
+                        "name": "name",
+                        "value": name
+                    },
+                    {
+                        "name" : "score",
+                        "value": score
+                    }
+                ]
+            },
+            "filter": {
+                "indy": {
+                    "cred_def_id": creddef_id
+                }
+            },
+            "trace": "true"
+        }
         headers = {"Content-Type": "application/json"}
+
 
         response = requests.post(
             url,
             json=data,
             headers=headers)
 
+        print(data)
+        
         if response.status_code == 200:
-            data = json.loads(response.text)
-            session['processId'] = data['processId']
-
-            return render_template('loading.html')
+            return render_template('success.html')
 
         else:
             return render_template('failure.html')    
@@ -77,14 +96,12 @@ def create_connection_invitation():
     
     file_name = 'connection'
 
-    if os.path.getsize(file_name) == 0 and response.status_code == 200:
+    if response.status_code == 200:
         with open(file_name, 'w') as file:
             file.write(response.text)
         return 'Message written to file.'
     else:
-        return 'File already has content. Nothing was written.'
-
-    return "done"
+        return 'not available'
 
 def check_connection():
     with open('connection', 'r') as f:
@@ -103,13 +120,25 @@ def check_connection():
 
     # Extract the value of 'state'
     state = data['results'][0]['state']
+    connection_id = data['results'][0]['connection_id']
 
     if state == 'active':
-        return 'established'
+        return connection_id
     else:
         return 'waiting'
 
+def get_credential_definition():
+    url =  'https://faber-api.educa.ch/credential-definitions/created'
+    
+    response = requests.get(url)
+
+    data = json.loads(response.content)
+
+    credential_definition_id = data['credential_definition_ids'][0]
+
+    return credential_definition_id
+        
+
 
 if __name__ == "__main__":
-    app.run(port=5001)
-    app.run(debug=False)  
+    app.run(port=5001, debug=False)

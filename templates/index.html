@@ -6,12 +6,17 @@
 {% endblock %}
 
 {% block index %}
+
+
 <form action="" method="post">
-    <label for="input-box">Geben Sie ihren Namen ein:</label>
+    <label for="input-box">Geben Sie ihren Namen und den Score ein:</label>
     <br>
     <input type="text" id="input-box" name="name" required>
     <br>
+    <input type="text" id="input-box" name="score" required>
+    <br>
     <button type="submit">Submit</button>
   </form>
+
 
 {% endblock %}
